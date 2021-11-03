@@ -6,8 +6,6 @@ create table if not exists "Vehicle Type"
 	type varchar(40)
 );
 
-alter table "Vehicle Type" owner to micah_groeling;
-
 create table if not exists "State"
 (
 	abbreviation varchar(2) not null
@@ -15,8 +13,6 @@ create table if not exists "State"
 			primary key,
 	name varchar(40)
 );
-
-alter table "State" owner to micah_groeling;
 
 create table if not exists "Vehicle"
 (
@@ -37,8 +33,6 @@ create table if not exists "Vehicle"
 			references "State"
 );
 
-alter table "Vehicle" owner to micah_groeling;
-
 create table if not exists "Location"
 (
 	id serial
@@ -52,8 +46,6 @@ create table if not exists "Location"
 		constraint location_state_abbreviation_fk
 			references "State"
 );
-
-alter table "Location" owner to micah_groeling;
 
 create table if not exists "Ride"
 (
@@ -76,8 +68,6 @@ create table if not exists "Ride"
 			references "Location"
 );
 
-alter table "Ride" owner to micah_groeling;
-
 create table if not exists "User"
 (
 	id serial
@@ -90,8 +80,6 @@ create table if not exists "User"
 	phone varchar(20),
 	"isAdmin" boolean
 );
-
-alter table "User" owner to micah_groeling;
 
 create table if not exists "Driver"
 (
@@ -107,8 +95,6 @@ create table if not exists "Driver"
 			references "State"
 );
 
-alter table "Driver" owner to micah_groeling;
-
 create table if not exists "Authorization"
 (
 	"driverId" integer not null
@@ -120,8 +106,6 @@ create table if not exists "Authorization"
 	constraint authorization_pk
 		primary key ("driverId", "vehicleId")
 );
-
-alter table "Authorization" owner to micah_groeling;
 
 create table if not exists "Drivers"
 (
@@ -135,8 +119,6 @@ create table if not exists "Drivers"
 		primary key ("driverId", "rideId")
 );
 
-alter table "Drivers" owner to micah_groeling;
-
 create table if not exists "Passenger"
 (
 	"userId" integer not null
@@ -148,6 +130,4 @@ create table if not exists "Passenger"
 	constraint passenger_pk
 		primary key ("userId", "rideId")
 );
-
-alter table "Passenger" owner to micah_groeling;
 

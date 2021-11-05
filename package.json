@@ -1,0 +1,13 @@
+{
+  "name": "ride-share",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/Micahchondria/ride-share.git",
+  "author": "catherinedynda <catherinedynda@users.noreply.github.com>",
+  "license": "MIT",
+  "dependencies": {
+    "knex": "^0.95.13",
+    "objection": "^2.2.18",
+    "pg": "^8.7.1"
+  }
+}

@@ -5,4 +5,5 @@ class Driver extends Model{
         return 'driver';
     }
 }
+
 module.exports = {Driver};

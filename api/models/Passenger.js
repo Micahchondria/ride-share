@@ -1,30 +1,30 @@
-const exports = module.exports = {}
+// const exports = module.exports = {}
 const { Model } = require('objection');
 const { knex } = require('../db.js');
-class User extends Model{
+class Passenger extends Model{
     static get tableName() {
-        return 'User';
+        return 'Passenger';
     }
     static get relationMappings(){
-        const Driver=require("./Driver.js");
-        const Passenger=require("./Passenger.js");
+        const User=require("./User.js");
+        const Ride=require("./Ride.js");
 
         return {
-            driver: {
+            ride: {
                 relation: Model.HasManyRelation,
-                modelClass: Driver,
+                modelClass: Ride,
                 join:{
-                    from: "User.id",
-                    to: "Driver.userId"
+                    from: "Passenger.rideId",
+                    to: "Ride.id"
                 },
             },
 
-            passenger: {
+            user: {
                 relation: Model.HasManyRelation,
                 modelClass: Passenger,
                 join:{
-                    from: "User.id",
-                    to: "Passenger.passengerId"
+                    from: "Passenger.userId",
+                    to: "User.id"
                 },
             }
         }
@@ -41,4 +41,4 @@ class User extends Model{
       });
     }
 }
-module.exports = {User};
+module.exports = {Passenger};

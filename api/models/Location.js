@@ -6,8 +6,17 @@ class Location extends Model {
     }
 
     static get relationMappings() {
-        return {
+        const State = require('./State');
 
+        return {
+            stateRelation: {
+                relation: Model.BelongsToOneRelation,
+                modelClass: State,
+                join: {
+                    from: 'Location.state',
+                    to: 'State.abbreviation'
+                }
+            }
         }
     }
 }

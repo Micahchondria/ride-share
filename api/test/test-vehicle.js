@@ -45,59 +45,6 @@ async function crudTest() {
     }
 }
 
-async function createDataTest() {
-    try {
-        const testVehicle = await Vehicle.query().insert({
-            make: 10,
-            model: 'Truck',
-            color: 'Green',
-            capacity: 5,
-            mpg: 25,
-            licensePlate: 'TRUCK',
-            vehicleTypeId: 1,
-            licenseState: 'AK'
-        });
-        console.log(testVehicle);
-    } catch (e) {
-        console.log(e);
-    }
-}
-
-async function retrieveDataTest() {
-    try {
-        const testVehicle = await Vehicle.query()
-            .where('id', '1');
-        console.log(testVehicle);
-    } catch (e) {
-        console.log(e);
-    }
-}
-
-async function updateDataTest() {
-    try {
-        const updatedMake = await Vehicle.query()
-            .where('licensePlate', 'like', 'TRUCK')
-            .patch({
-                make: 11
-            });
-        const testVehicle = await Vehicle.query()
-            .where('licensePlate', 'like', 'TRUCK');
-        console.log(testVehicle);
-    } catch (e) {
-        console.log(e);
-    }
-}
-
-async function deleteDataTest() {
-    try {
-        const deletedVehicle = await Vehicle.query()
-            .delete()
-            .where('licensePlate', 'like', 'TRUCK');
-    } catch (e) {
-        console.log(e)
-    }
-}
-
 async function relationTests() {
     try {
         let vehicles = await Vehicle.query()
@@ -120,10 +67,6 @@ async function relationTests() {
 
 async function runTests() {
     await crudTest();
-    // await createDataTest();
-    // await retrieveDataTest();
-    // await updateDataTest();
-    // await deleteDataTest();
     await relationTests();
     knex.destroy();
 }

@@ -9,7 +9,7 @@ async function relationTest() {
     try {
         let sampleVehicleTypes = await VehicleType.query()
             .where('id', '1');
-        let sampleVehicle = await sampleVehicleType[0].$relatedQuery('vehicle')
+        let sampleVehicle = await sampleVehicleTypes[0].$relatedQuery('vehicle')
             .select('model', 'capacity');
         console.log(sampleVehicle);
     } catch (e) {

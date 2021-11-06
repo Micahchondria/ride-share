@@ -1,4 +1,5 @@
 const { Model } = require('objection');
+const Ride = require('./Ride');
 
 class Location extends Model {
     static get tableName() {
@@ -7,6 +8,7 @@ class Location extends Model {
 
     static get relationMappings() {
         const State = require('./State');
+        const Ride = require('./Ride');
 
         return {
             stateRelation: {
@@ -15,6 +17,24 @@ class Location extends Model {
                 join: {
                     from: 'Location.state',
                     to: 'State.abbreviation'
+                }
+            },
+
+            rideFrom: {
+                relation: Model.HasManyRelation,
+                modelClass: Ride,
+                join: {
+                    from: 'Location.id',
+                    to: 'Ride.fromLocationId'
+                }
+            },
+
+            rideTo: {
+                relation: Model.HasManyRelation,
+                modelClass: Ride,
+                join: {
+                    from: 'Location.id',
+                    to: 'Ride.toLocationId'
                 }
             }
         }

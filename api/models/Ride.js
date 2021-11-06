@@ -10,8 +10,6 @@ class Ride extends Model {
         const Location = require('./Location');
         // const Driver = require('./Driver');
         // const User = require('./User');
-        const Drivers = require('./Drivers');
-        const Passenger = require('./Passenger');
 
         return {
             vehicle: {
@@ -69,7 +67,7 @@ class Ride extends Model {
 
             drivers: {
                 relation: Model.HasManyRelation,
-                modelClass: Drivers,
+                modelClass: __dirname + '/Drivers',
                 join: {
                     from: 'Ride.id',
                     to: 'Drivers.driverId'

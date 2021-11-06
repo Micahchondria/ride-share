@@ -60,6 +60,10 @@ async function relationTests() {
         let state = await testVehicle.$relatedQuery('state')
             .select('abbreviation', 'name');
         console.log(state);
+
+        // test Authorization relation
+        let authorization = await testVehicle.$relatedQuery('authorization');
+        console.log(authorization);
     } catch (e) {
         console.log(e);
     }

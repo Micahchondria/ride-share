@@ -1,4 +1,4 @@
-const exports = module.exports = {}
+// const exports = module.exports = {}
 const { knex } = require("../db.js");
 const { Model } = require('objection');
 class Driver extends Model{

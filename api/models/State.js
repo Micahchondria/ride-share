@@ -8,10 +8,13 @@ class State extends Model {
         return 'State';
     }
 
+    static get idColumn() {
+        return 'abbreviation';
+    }
+
     static get relationMappings() {
         const Vehicle = require('./Vehicle');
         const Location = require('./Location');
-        const Driver = require('./Driver');
 
         return {
             vehicle: {
@@ -34,7 +37,7 @@ class State extends Model {
 
             driver: {
                 relation: Model.HasManyRelation,
-                modelClass: Driver,
+                modelClass: __dirname + "/Driver",
                 join: {
                     from: 'State.abbreviation',
                     to: 'Driver.licenseState'

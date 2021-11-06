@@ -51,6 +51,12 @@ async function relationTests() {
         let state = await testLocation.$relatedQuery('stateRelation')
             .select('abbreviation', 'name');
         console.log(state);
+
+        // test Ride relations
+        let rideFrom = await testLocation.$relatedQuery('rideFrom');
+        console.log(rideFrom);
+        let rideTo = await testLocation.$relatedQuery('rideTo');
+        console.log(rideTo);
     } catch (e) {
         console.log(e);
     }

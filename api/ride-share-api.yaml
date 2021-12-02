@@ -18,43 +18,6 @@ components:
           type: string
       example:
         message: Something strange happened.
-    User:
-      description: Each user of **Ride Share**
-      type: object
-      properties:
-        id:
-          type: integer
-        firstName:
-          type: string
-        lastName:
-          type: string
-        email:
-          type: string
-        password:
-          type: string
-        phone:
-          type: string
-        isAdmin:
-          type: boolean
-      example:
-        id: 42
-        firstName: Fred
-        lastName: Ziffle
-        email: fred@example.com
-        password: super-secret-thing
-        phone: 765-555-1212
-        isAdmin: false
-    VehicleType:
-      description: Type of a vehicle
-      type: object
-      properties:
-        id:
-          type: integer
-        vehicleType:
-          type: string
-      example:
-        id: 42
-        type: Pickup Truck
     Driver:
       description: Driver of car
       type: object
@@ -88,18 +51,16 @@ components:
           type: string
         zipCode:
           type: string
-        fuelPrice:
-          type: number
-        ridesFrom:
-          type: object
-          properties:
-            "$ref": "#/components/schemas/Ride"
-          required: false
-        ridesTo:
-          type: object
-          properties:
-            "$ref": "#/components/schemas/Ride"
-          required: false
+        # ridesFrom:
+        #   type: object
+        #   properties:
+        #     $ref: "#/components/schemas/Ride"
+        #   required: false
+        # ridesTo:
+        #   type: object
+        #   properties:
+        #     $ref: "#/components/schemas/Ride"
+        #   required: false
       example:
         id: 5
         name: Home
@@ -107,21 +68,113 @@ components:
         city: Pencilsville
         state: PA
         zipCode: '34676'
-        fuelPrice: 3.1415
-        ridesFrom:
-          id: 2
-          date: '2011-11-11'
-          time: 11:11PM
-          distance: 111.11
-          fee: 0
-          vehicleId: 74
-        ridesTo:
-          id: 2
-          date: '2011-11-11'
-          time: 11:11PM
-          distance: 111.11
-          fee: 0
-          vehicleId: 74 
+    Ride:
+      description: An instance of a ride
+      type: object
+      properties:
+        id:
+          type: integer
+        date:
+          type: string
+        time:
+          type: string
+        distance:
+          type: number
+        fuelPrice:
+          type: number
+        fee:
+          type: number
+        vehicleId:
+          type: integer
+        fromLocation:
+          type: object
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            address:
+              type: string
+            city:
+              type: string
+            state:
+              type: string
+            zipCode:
+              type: string
+        toLocationId:
+          type: object
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            address:
+              type: string
+            city:
+              type: string
+            state:
+              type: string
+            zipCode:
+              type: string
+    User:
+      description: Each user of **Ride Share**
+      type: object
+      properties:
+        id:
+          type: integer
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        phone:
+          type: string
+        isAdmin:
+          type: boolean
+      example:
+        id: 42
+        firstName: Fred
+        lastName: Ziffle
+        email: fred@example.com
+        password: super-secret-thing
+        phone: 765-555-1212
+        isAdmin: false
+    Vehicle:
+      description: Each vehicle used for rides
+      type: object
+      properties:
+        id:
+          type: integer
+        make:
+          type: string
+        model:
+          type: string
+        color:
+          type: string
+        vehicleTypeId:
+          type: integer
+        capacity:
+          type: integer
+        mpg:
+          type: number
+        licenseState:
+          type: integer
+        licensePlate:
+          type: string
+    VehicleType:
+      description: Type of a vehicle
+      type: object
+      properties:
+        id:
+          type: integer
+        vehicleType:
+          type: string
+      example:
+        id: 42
+        type: Pickup Truck
 paths:
   /users:
     summary: Operations on users
@@ -205,6 +258,212 @@ paths:
                 $ref: '#/components/schemas/User'
         '400':
           description: User not found
+    patch:
+      summary: Update user by ID
+      tags:
+        - user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of user to update
+          schema:
+            type: integer
+      requestBody:
+        description: Updated user
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                phone:
+                  type: string
+                isAdmin:
+                  type: boolean
+      responses:
+        '200':
+          description: Successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#components/schemas/User'
+  /users/{uid}/rides/{rid}:
+    summary: Adds and removes passengers from rides
+    delete:
+      summary: Remove passenger from ride
+      tags:
+        - user
+        - ride
+      parameters:
+        - name: uid
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: rid
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Passenger deleted successfully.
+        '400':
+          description: Passenger not deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: User ID does not exist
+    post:
+      summary: Add passenger to ride
+      tags:
+        - user
+        - ride
+      parameters:
+        - name: uid
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: rid
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '201':
+          description: Created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  userId:
+                    type: integer
+                  rideId:
+                    type: integer
+                example:
+                  userId: 42
+                  rideId: 2
+        '400':
+          description: Not created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: IDs do not exist
+  /vehicles:
+    summary: Operations on vehicles
+    get:
+      summary: Get all vehicles
+      tags:
+        - vehicle
+      responses:
+        '200':
+          description: All vehicles fetched successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#components/schemas/Vehicle'
+    post:
+      summary: Create a new vehicle
+      tags:
+        - vehicle
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#components/schemas/Vehicle'
+      responses:
+        '201':
+          description: Created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  vehicleId:
+                    type: integer
+                example:
+                  vehicleId: 16
+        '400':
+          description: Not created
+          content:
+            application/json:
+              schema:
+                $ref: '#components/schemas/Error'
+              example:
+                message: Duplicate license plate  
+  /vehicles/{id}:
+    summary: Operations on a specific vehicle
+    patch:
+      summary: Update vehicle by ID
+      tags:
+        - vehicle
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of vehicle to update
+          schema:
+            type: integer
+      requestBody:
+        description: Updated vehicle
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Vehicle'
+      responses:
+        '200':
+          description: Successfully updated vehicle
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vehicle'
+    get:
+      summary: Retrieve all vehicles
+      tags:
+        - vehicle
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of vehicle to fetch
+          schema:
+            type: integer
+        - name: drivers
+          in: query
+          description: Fetches authorized drivers for vehicle
+          schema:
+            type: boolean
+        - name: rides
+          in: query
+          description: Fetches rides assigned to this vehicle
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Successfully retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vehicle'
   /vehicle-types:
     post:
       summary: Create a new vehicle type.
@@ -290,7 +549,13 @@ paths:
           description: Vehicle deleted
         '400':
           description: Can't delete vehicle
-  "/drivers":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: Vehicle ID does not exist
+  /drivers:
     summary: Operations on drivers
     post:
       summary: Create a new driver
@@ -342,7 +607,7 @@ paths:
                 "$ref": "#/components/schemas/Error"
               example:
                 message: Requested resource not found
-  "/drivers/{id}":
+  /drivers/{id}:
     summary: Operations on a single driver
     delete:
       summary: Delete an existing driver
@@ -365,7 +630,147 @@ paths:
                 "$ref": "#/components/schemas/Error"
               example:
                 message: No such driver ID
-  "/locations":
+  /rides:
+    summary: Operations on rides
+    get:
+      summary: Get all rides
+      tags:
+        - ride
+      parameters:
+        - name: drivers
+          in: query
+          description: Fetch drivers for this ride
+          schema:
+            type: boolean
+        - name: passengers
+          in: query
+          description: Fetch passengers on this ride
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: All rides fetched successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Ride'
+    post:
+      summary: Create a new ride
+      tags:
+        - ride
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Ride'
+      responses:
+        '201':
+          description: Created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  rideId:
+                    type: integer
+                example:
+                  rideId: 2
+        '400':
+          description: Not created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: Invalid date
+  /rides{id}:
+    summary: Operations on a single ride
+    get:
+      summary: Get ride by ID
+      tags:
+        - ride
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of ride to fetch
+          schema:
+            type: integer
+        - name: drivers
+          in: query
+          description: Fetch drivers for this ride
+          schema:
+            type: boolean
+        - name: passengers
+          in: query
+          description: Fetch passengers on this ride
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Successfully retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ride'
+        '400':
+          description: No ride found with this ID
+    patch:
+      summary: Update an existing ride
+      tags:
+        - ride
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+      requestBody:
+        description: Updated ride
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                date:
+                  type: string
+                time:
+                  type: string
+                distance:
+                  type: number
+                fuelPrice:
+                  type: number
+                fee:
+                  type: number
+                vehicleId:
+                  type: integer
+                fromLocationId:
+                  type: integer
+                toLocationId:
+                  type: integer
+              example:
+                date: "2011-10-16"
+                time: "20:00:00"
+                distance: 43.0
+                fuelPrice: 3.0
+                fee: 47.3
+                vehicleId: 42
+                fromLocationId: 1
+                toLocationId: 2
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ride'
+        '400':
+          description: No such ride ID
+  /locations:
     summary: Operations on locations
     post:
       summary: Create a new location.
@@ -477,7 +882,7 @@ paths:
                 "$ref": "#/components/schemas/Error"
               example:
                 message: Requested resource not found
-  "/locations/{id}":
+  /locations/{id}:
     summary: Operations on a single location
     get:
       summary: Get location by ID

@@ -55,6 +55,73 @@ components:
       example:
         id: 42
         type: Pickup Truck
+    Driver:
+      description: Driver of car
+      type: object
+      properties:
+        id: 
+          type: integer
+        userId:
+          type: integer
+        licenseNumber:
+          type: string
+        licenseState:
+          type: string
+      example:
+        id: 43
+        userId: 36
+        licenseNumber: 2003311
+        licenseState: IN
+    Location:
+      description: The start or end of a ride
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        address:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        zipCode:
+          type: string
+        fuelPrice:
+          type: number
+        ridesFrom:
+          type: object
+          properties:
+            "$ref": "#/components/schemas/Ride"
+          required: false
+        ridesTo:
+          type: object
+          properties:
+            "$ref": "#/components/schemas/Ride"
+          required: false
+      example:
+        id: 5
+        name: Home
+        address: 123 Sharpp Rd.
+        city: Pencilsville
+        state: PA
+        zipCode: '34676'
+        fuelPrice: 3.1415
+        ridesFrom:
+          id: 2
+          date: '2011-11-11'
+          time: 11:11PM
+          distance: 111.11
+          fee: 0
+          vehicleId: 74
+        ridesTo:
+          id: 2
+          date: '2011-11-11'
+          time: 11:11PM
+          distance: 111.11
+          fee: 0
+          vehicleId: 74 
 paths:
   /users:
     summary: Operations on users
@@ -223,3 +290,336 @@ paths:
           description: Vehicle deleted
         '400':
           description: Can't delete vehicle
+  "/drivers":
+    summary: Operations on drivers
+    post:
+      summary: Create a new driver
+      tags:
+      - driver
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                userId:
+                  type: integer
+                licenseNumber:
+                  type: string
+                licenseState:
+                  type: string
+              example:
+                id: 22
+                userId: 11
+                licenseNumber: 1098321
+                licenseState: IN
+      responses:
+        '201':
+          description: Created sucessfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  userId:
+                    type: integer
+                  licenseNumber:
+                    type: string
+                  licenseState:
+                    type: string
+                example:
+                  userId: 33
+                  licenseNumber: 911141
+                  licenseState: IN
+        '404':
+          description: Not created
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+              example:
+                message: Requested resource not found
+  "/drivers/{id}":
+    summary: Operations on a single driver
+    delete:
+      summary: Delete an existing driver
+      tags:
+      - driver
+      parameters:
+      - name: id
+        in: path
+        schema:
+          type: integer
+        required: true
+      responses:
+        '200':
+          description: Driver deleted
+        '404':
+          description: Can't delete driver
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+              example:
+                message: No such driver ID
+  "/locations":
+    summary: Operations on locations
+    post:
+      summary: Create a new location.
+      description: _Each_ location in **Ride Share** has a `name`, making it easier
+        for riders to identify the location.
+      tags:
+      - location
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                address:
+                  type: string
+                city:
+                  type: string
+                state:
+                  type: string
+                zipCode:
+                  type: string
+                fuelPrice:
+                  type: number
+              example:
+                name: House
+                address: 123 Example St.
+                city: Fort Wayne
+                state: IN
+                zipCode: '16989'
+                fuelPrice: 2.9112
+      responses:
+        '201':
+          description: New location created
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Location"
+        '404':
+          description: New location creation attempt failed
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+              example:
+                message: Requested resource not found
+    get:
+      summary: Retrieve all locations
+      tags:
+      - location
+      parameters:
+      - name: name
+        in: query
+        required: false
+        description: name of location to fetch
+        schema:
+          type: string
+      - name: address
+        in: query
+        required: false
+        description: address of location to fetch
+        schema:
+          type: string
+      - name: city
+        in: query
+        required: false
+        description: city of location to fetch
+        schema:
+          type: string
+      - name: state
+        in: query
+        required: false
+        description: state of location to fetch
+        schema:
+          type: string
+      - name: zipCode
+        in: query
+        required: false
+        description: zipCode of location to fetch
+        schema:
+          type: string
+      - name: ridesFrom
+        in: query
+        required: false
+        description: return the information on rides from this location too
+        schema:
+          type: boolean
+      - name: ridesTo
+        in: query
+        required: false
+        description: return the information on rides to this location too
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Location"
+        '404':
+          description: Failed retrieval
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+              example:
+                message: Requested resource not found
+  "/locations/{id}":
+    summary: Operations on a single location
+    get:
+      summary: Get location by ID
+      tags:
+      - location
+      parameters:
+      - name: name
+        in: query
+        required: false
+        description: name of location to fetch
+        schema:
+          type: string
+      - name: address
+        in: query
+        required: false
+        description: address of location to fetch
+        schema:
+          type: string
+      - name: city
+        in: query
+        required: false
+        description: city of location to fetch
+        schema:
+          type: string
+      - name: state
+        in: query
+        required: false
+        description: state of location to fetch
+        schema:
+          type: string
+      - name: zipCode
+        in: query
+        required: false
+        description: zipCode of location to fetch
+        schema:
+          type: string
+      - name: ridesFrom
+        in: query
+        required: false
+        description: return the information on rides from this location too
+        schema:
+          type: boolean
+      - name: ridesTo
+        in: query
+        required: false
+        description: return the information on rides to this location too
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: Successfully retrieved
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Location"
+        '404':
+          description: Location not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+              example:
+                message: Location not found
+    patch:
+      summary: Update an existing location
+      tags:
+      - location
+      parameters:
+      - name: id
+        in: path
+        schema:
+          type: integer
+        required: true
+      - name: name
+        in: query
+        required: false
+        description: name of location to fetch
+        schema:
+          type: string
+      - name: address
+        in: query
+        required: false
+        description: address of location to fetch
+        schema:
+          type: string
+      - name: city
+        in: query
+        required: false
+        description: city of location to fetch
+        schema:
+          type: string
+      - name: state
+        in: query
+        required: false
+        description: state of location to fetch
+        schema:
+          type: string
+      - name: zipCode
+        in: query
+        required: false
+        description: zipCode of location to fetch
+        schema:
+          type: string
+      requestBody:
+        description: Updated location
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                address:
+                  type: string
+                city:
+                  type: string
+                state:
+                  type: string
+                zipCode:
+                  type: string
+                fuelPrice:
+                  type: number
+              example:
+                name: House
+                address: 123 Street St.
+                city: Cartoonville
+                state: IN
+                zipCode: '321321'
+                fuelPrice: 1.001
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Location"
+        '404':
+          description: Location not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+              example:
+                message: Location not found

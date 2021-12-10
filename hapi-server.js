@@ -114,7 +114,7 @@ async function init() {
         options: {
           validate: {
             payload: Joi.object({
-              licenseNumber: Joi.string().min(1).max(30).required(),
+              licenseNumber: Joi.string().min(1).max(20).required(),
               licenseState: Joi.string().min(1).max(2).required(),
             })
           }
@@ -126,7 +126,7 @@ async function init() {
             licenseState: request.payload.licenseState
           });
           if (driver) return h.response(driver).code(201);
-          return Boom.badRequest(`Could not create driver with ID ${request.params.id}`); //NOTE Should verify user is not already registered as a driver
+          return Boom.badRequest(`Could not create driver with ID ${request.params.id}`);
         }
       },
       {

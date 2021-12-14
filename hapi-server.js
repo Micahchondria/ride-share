@@ -118,7 +118,6 @@ async function init() {
               lastName: Joi.string().min(1).max(140).required(),
               email: Joi.string().min(1).max(140).required(),
               password: Joi.string().min(1).max(140).required(),
-              phone: Joi.number().integer().min(1000000).max(9999999999).required(),
               isAdmin: Joi.boolean().required()
             })
           }

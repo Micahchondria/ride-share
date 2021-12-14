@@ -41,4 +41,4 @@ class Passenger extends Model{
       });
     }
 }
-module.exports = {Passenger};
+module.exports = Passenger;

@@ -3,12 +3,12 @@ const knex = require('knex')({
     connection: {
         host: 'pg.cse.taylor.edu',
         user: 'catherine_bell',
-        password: 'luqecomi',
+        password: 'kunitase',
         database: 'catherine_bell'
     }
 });
 
-const { Model } = require("objection");
-Model.knex(knex);
+// const { Model } = require("objection");
+// Model.knex(knex);
 
 module.exports = knex;

@@ -1,22 +1,34 @@
-const knex = require("./api/db.js");
-const objection = require("objection");
-objection.Model.knex = knex;
+// const knex = require("./api/db.js");
+// console.log(knex);
+const knex = require("knex")({
+  client: "pg",
+  connection: {
+    host: 'pg.cse.taylor.edu',
+    user: 'catherine_bell',
+    password: 'kunitase',
+    database: 'catherine_bell'
+  },
+});
+// const objection = require("objection");
+// objection.Model.knex = knex;
+const { Model } = require("objection");
+Model.knex(knex);
 
 // Configure Hapi.
 const Hapi = require("@hapi/hapi");
 const Boom = require("@hapi/boom");
-const Joi = require('joi');
+const Joi = require('@hapi/joi');
 
 // Load model classes.
-const Driver = require("./models/Driver");
-const Drivers = require("./models/Drivers");
-const Location = require("./models/Location");
-const Passenger = require("./models/Passenger");
-const Ride = require("./models/Ride");
-const State = require("./models/State");
-const User = require("./models/User");
-const Vehicle = require("./models/Vehicle");
-const VehicleType = require("./models/VehicleType");
+const Driver = require("./api/models/Driver");
+const Drivers = require("./api/models/Drivers");
+const Location = require("./api/models/Location");
+const Passenger = require("./api/models/Passenger");
+const Ride = require("./api/models/Ride");
+const State = require("./api/models/State");
+const User = require("./api/models/User");
+const Vehicle = require("./api/models/Vehicle");
+const VehicleType = require("./api/models/VehicleType");
 
 const server = Hapi.server({
     host: "localhost",
@@ -29,13 +41,20 @@ const server = Hapi.server({
 async function init() {
     // Show routes at startup.
     await server.register(require("blipp"));
+
+    await server.register({
+      plugin: require("hapi-pino"),
+      options: {
+        prettyPrint: true
+      }
+    });
     
     server.route([
       {
         method: "GET",
         path: "/",
         handler: (request, h) => {
-          "Welcome to the ride share site"
+          return "Welcome to the ride share site";
         },
       },
       {
@@ -46,7 +65,7 @@ async function init() {
         },
       },
       {
-        method: "/GET",
+        method: "GET",
         path: "/drivers",
         handler: (request, h) => {
           return Drivers.query();
@@ -80,6 +99,8 @@ async function init() {
           return Location.query();
         },
       },
+      
+      // not working, probably because of messing with users; easy to fix
       {
         method: "GET",
         path: "/passengers",
@@ -108,6 +129,46 @@ async function init() {
           return Boom.badRequest(`Could not create user with ID ${request.params.id}`);
         }
       },
+
+      {
+        method: "POST",
+        path: "/login",
+        config: {
+          description: "Log in",
+          validate: {
+            payload: Joi.object({
+              email: Joi.string().email().required(),
+              password: Joi.string().min(8).required(),
+            }),
+          },
+        },
+        handler: async (request, h) => {
+          const user = await User.query()
+            .where("email", request.payload.email)
+            .first();
+          if (
+            user &&
+            (await user.verifyPassword(request.payload.password))
+          ) {
+            return {
+              ok: true,
+              msge: `Logged in successfully as '${request.payload.email}'`,
+              details: {
+                id: user.id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+              },
+            };
+          } else {
+            return {
+              ok: false,
+              msge: "Invalid email or password",
+            };
+          }
+        },
+      },
+
       {
         method: "POST",
         path: "/drivers",
@@ -151,11 +212,11 @@ async function init() {
           return Boom.badRequest(`Could not create ride with ID ${request.params.id}`);
         }  
       },
-      {
-        method: "POST",
-        path: "/vehicletypes",
+      // {
+      //   method: "POST",
+      //   path: "/vehicletypes",
         
-      },
+      // },
       { 
         method: "POST",
         path: "/vehicles",

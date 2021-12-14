@@ -1,10 +1,10 @@
-// const exports = module.exports = {}
-const { knex } = require("../db.js");
+
 const { Model } = require('objection');
 class User extends Model{
     static get tableName() {
         return 'User';
     }
+
     static get relationMappings(){
         const Driver = require("./Driver.js");
         const Passenger = require("./Passenger.js");
@@ -14,7 +14,7 @@ class User extends Model{
                 relation: Model.HasManyRelation,
                 modelClass: Driver,
                 join:{
-                    from: "User.id",
+                    from: "user.id",
                     to: "Driver.userId"
                 },
             },
@@ -23,12 +23,13 @@ class User extends Model{
                 relation: Model.HasManyRelation,
                 modelClass: Passenger,
                 join:{
-                    from: "User.id",
+                    from: "user.id",
                     to: "Passenger.passengerId"
                 },
             }
         }
     }
+    
     getDrivers(){
       return this.$relatedQuery("driver")
       .$relatedQuery("user")
@@ -40,6 +41,10 @@ class User extends Model{
         console.log(err);
       });
     }
+
+    async verifyPassword(plainTextPassword) {
+        return plainTextPassword === this.password;
+    }
 }
 
-module.exports = {User};
+module.exports = User;

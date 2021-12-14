@@ -2,7 +2,7 @@ const { Model } = require('objection');
 const knex = require('../db.js');
 Model.knex(knex);
 const Driver = require("../models/Driver.js");
-
+console.log(Driver);
 
 async function crudTest() {
     try {
@@ -10,8 +10,8 @@ async function crudTest() {
         let testDriver = await Driver.query().insert({
             id: 1,
             userId: 2,
-            liscenceNumber = 'HIJKL',
-            liscenceState = 4,
+            liscenceNumber: 'HIJKL',
+            liscenceState: 4,
         });
         console.log(testDriver);
 

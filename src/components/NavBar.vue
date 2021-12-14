@@ -29,8 +29,10 @@
       </template>
 
       <v-list>
-        <v-list-item v-bind:to="{ name: 'users' }">
-          <v-list-item-title>Users</v-list-item-title>
+        <v-list-item v-bind:to="{ name: 'system' }">
+        <!-- <v-list-item v-if="isAdmin" v-bind:to="{ name: 'system' }"> -->
+        <!-- <v-list-item v-if="$store.state.currentAccount.isAdmin" v-bind:to="{ name: 'system' }"> -->
+          <v-list-item-title>System</v-list-item-title>
         </v-list-item>
 
         <v-divider></v-divider>
@@ -48,6 +50,10 @@ export default {
   computed: {
     isLoggedIn() {
       return this.$store.getters.isLoggedIn;
+    },
+
+    isAdmin() {
+      return this.$store.getters.isAdmin;
     }
   },
 

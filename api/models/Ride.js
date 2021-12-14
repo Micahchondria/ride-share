@@ -9,7 +9,7 @@ class Ride extends Model {
         const Vehicle = require('./Vehicle');
         const Location = require('./Location');
         // const Driver = require('./Driver');
-        // const User = require('./User');
+        const User = require('./User');
 
         return {
             vehicle: {
@@ -52,18 +52,18 @@ class Ride extends Model {
             //     }
             // },
 
-            // user: {
-            //     relation: Model.ManyToManyRelation,
-            //     modelClass: User,
-            //     join: {
-            //         from: 'Ride.id',
-            //         through: {
-            //             from: 'Passenger.rideId',
-            //             to: 'Passenger.userId'
-            //         },
-            //         to: 'User.id'
-            //     }
-            // }
+            user: {
+                relation: Model.ManyToManyRelation,
+                modelClass: __dirname + "/User",
+                join: {
+                    from: 'Ride.id',
+                    through: {
+                        from: 'Passenger.rideId',
+                        to: 'Passenger.userId'
+                    },
+                    to: 'User.id'
+                }
+            },
 
             drivers: {
                 relation: Model.HasManyRelation,

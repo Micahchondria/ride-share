@@ -21,7 +21,7 @@ class Passenger extends Model{
 
             user: {
                 relation: Model.HasManyRelation,
-                modelClass: Passenger,
+                modelClass: User,
                 join:{
                     from: "Passenger.userId",
                     to: "User.id"

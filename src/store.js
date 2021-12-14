@@ -27,6 +27,10 @@ export default new Vuex.Store({
   getters: {
     isLoggedIn(state) {
       return state.currentAccount !== null;
+    },
+
+    isAdmin(state) {
+      return state.admin;
     }
   },
 
@@ -37,6 +41,7 @@ export default new Vuex.Store({
     logIn(state, account) {
       state.currentAccount = account;
       state.admin = account.isAdmin;
+      console.log(`isAdmin: ${account}`);
     },
     logOut(state) {
       state.currentAccount = null;

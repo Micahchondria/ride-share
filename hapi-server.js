@@ -48,6 +48,8 @@ async function init() {
         prettyPrint: true
       }
     });
+
+    server.validator(Joi);
     
     server.route([
       {
@@ -74,8 +76,26 @@ async function init() {
       {
         method: "GET",
         path: "/rides",
+        options: {
+          validate: {
+            query: {
+              drivers: Joi.boolean(),
+              passengers: Joi.boolean()
+            }
+          }
+        },
         handler: (request, h) => {
-          return Ride.query();
+          // return Ride.query().withGraphFetched("fromLocation").withGraphFetched("toLocation");
+          let ride = Ride.query().withGraphFetched("fromLocation").withGraphFetched("toLocation");
+          if (request.query.drivers) {
+            ride = ride.withGraphFetched("drivers");
+          }
+          if (request.query.passengers) {
+            ride = ride.withGraphFetched("passenger");
+            // ride = ride.withGraphFetched("user");
+          }
+          // return Ride.query().withGraphFetched("fromLocation").withGraphFetched("toLocation");
+          return ride;
         },
       },
       {
@@ -100,14 +120,14 @@ async function init() {
         },
       },
       
-      // not working, probably because of messing with users; easy to fix
       {
         method: "GET",
         path: "/passengers",
         handler: (request, h) => {
-          return Passenger.query().withGraphFetched("user");
+          return Passenger.query().withGraphFetched("user").withGraphFetched("ride");
         },
       },
+
       {
         method: "POST",
         path: "/users",
@@ -181,7 +201,6 @@ async function init() {
         },
         handler: async (request, h) => {
           let driver = await Driver.query().insert({
-            userId: 1,
             licenseNumber: request.payload.licenseNumber,
             licenseState: request.payload.licenseState
           });
@@ -198,6 +217,7 @@ async function init() {
               date: Joi.string().min(1).max(50).required(),
               time: Joi.string().min(1).max(20).required(),
               distance: Joi.number().required(),
+              fuelPrice: Joi.number().required(),
               fee: Joi.number().required(),
               vehicleId: Joi.number().integer().required(),
               fromLocationId: Joi.number().integer().required(),
@@ -276,21 +296,43 @@ async function init() {
       },
       {
         method: "POST",
-        path: "/passengers",
-        handler: (request, h) => {
-          return Passenger.query();
+        path: "/users/{uid}/rides/{rid}",
+        options: {
+          validate: {
+            params: {
+              uid: Joi.number().integer().required(),
+              rid: Joi.number().integer().required()
+            }
+          }
         },
-      }
+        handler: async (request, h) => {
+          let user = await User.query().findById(request.params.uid);
+          let ride = await Ride.query().findById(request.params.rid);
+          await user.$relatedQuery('ride').relate(ride);
+          return h.response({userId: request.params.uid, rideId: request.params.rid}).code(201);
+        }
+      },
+
+      // does not work
+      // {
+      //   method: "POST",
+      //   path: "/passengers",
+      //   options: {
+      //     validate: {
+      //       payload: Joi.object({
+      //         userId: Joi.number().integer().required(),
+      //         rideId: Joi.number().integer().required()
+      //       })
+      //     }
+      //   },
+      //   handler: async (request, h) => {
+      //     let passenger = await Passenger.query().insert(request.payload);
+      //     if (passenger) return h.response(passenger).code(201);
+      //     return Boom.badRequest(`Could not add user with id ${request.payload.userId} to ride with id ${request.payload.rideId}`)
+      //   },
+      // }
 
     ]);
-    
-    // Output logging information.
-    // await server.register({
-    //     // plugin: require("hapi-pino"),
-    //     // options: {
-    //     // prettyPrint: true,
-    //     // },
-    // });
 
     await server.start();
 }

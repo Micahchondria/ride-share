@@ -123,6 +123,7 @@ export default {
           lastName: this.newMember.lastName,
           email: this.newMember.email,
           password: this.newMember.password,
+          admin: false
         })
         .then((result) => {
           // Based on whether things worked or not, show the

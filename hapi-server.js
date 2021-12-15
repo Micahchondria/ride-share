@@ -85,7 +85,6 @@ async function init() {
           }
         },
         handler: (request, h) => {
-          // return Ride.query().withGraphFetched("fromLocation").withGraphFetched("toLocation");
           let ride = Ride.query().withGraphFetched("fromLocation").withGraphFetched("toLocation");
           if (request.query.drivers) {
             ride = ride.withGraphFetched("drivers");
@@ -94,7 +93,6 @@ async function init() {
             ride = ride.withGraphFetched("passenger");
             // ride = ride.withGraphFetched("user");
           }
-          // return Ride.query().withGraphFetched("fromLocation").withGraphFetched("toLocation");
           return ride;
         },
       },
@@ -331,6 +329,30 @@ async function init() {
       //     return Boom.badRequest(`Could not add user with id ${request.payload.userId} to ride with id ${request.payload.rideId}`)
       //   },
       // }
+
+      {
+        method: "PATCH",
+        path: "/users/{id}",
+        options: {
+          validate: {
+            params: {
+              id: Joi.number().integer().min(0).required()
+            },
+            payload: {
+              firstName: Joi.string().min(1),
+              lastName: Joi.string().min(1),
+              email: Joi.string().min(1),
+              phone: Joi.string().min(10)
+            }
+          }
+        },
+        handler: async (request, h) => {
+          await User.query()
+            .findById(request.params.id)
+            .update(request.payload);
+          return User.query().findById(request.params.id);
+        }
+      }
 
     ]);
 

@@ -32,7 +32,7 @@ const VehicleType = require("./api/models/VehicleType");
 
 const server = Hapi.server({
     host: "localhost",
-    port: 8080,
+    port: 3000,
     routes: {
       cors: true,
     },

@@ -329,7 +329,7 @@ async function init() {
       //     return Boom.badRequest(`Could not add user with id ${request.payload.userId} to ride with id ${request.payload.rideId}`)
       //   },
       // }
-
+      
       {
         method: "PATCH",
         path: "/users/{id}",
@@ -352,8 +352,34 @@ async function init() {
             .update(request.payload);
           return User.query().findById(request.params.id);
         }
-      }
+      },
 
+      {
+        method: "PATCH",
+        path: "/vehicles/{licensePlate}",
+        options: {
+          validate: {
+            params: {
+              licensePlate: Joi.number().integer().min(0).required()
+            },
+            payload: {
+              make: Joi.string().min(1).max(140).required(),
+              model: Joi.string().min(1).max(140).required(),
+              color: Joi.string().min(1).max(140).required(),
+              vehicleTypeId: Joi.number().integer().required(),
+              capacity: Joi.number().integer().required(),
+              licenseState: Joi.string().min(1).max(2).required(),
+              licensePlate: Joi.string().min(1).max(15).required(),
+            }
+          }
+        },
+        handler: async (request, h) => {
+          await Vehicle.query()
+            .findById(request.params.licensePlate)
+            .update(request.payload);
+          return Vehicle.query().findById(request.params.licensePlate);
+        }
+      }
     ]);
 
     await server.start();

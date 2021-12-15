@@ -1,8 +1,13 @@
 <template>
   <v-container>
+    <template v-if="driverStatus">
+      <label>You are a driver</label>
+    </template>
+    <template v-else>
+    </template>
     <div>
         <h4 class="display-1">System</h4>
-
+        <v-btn v-if="!driverStatus" @click="becomeDriver()">Become a Driver</v-btn>
         <!-- VEHICLES -->
         <v-btn @click="showVehicles = !showVehicles">Vehicles</v-btn>
         <div v-if="showVehicles">
@@ -29,6 +34,9 @@
                     <v-icon small class="ml-2" @click="editvehicle(item)">
                     mdi-pencil
                     </v-icon>
+                    <v-icon small @click="addvehicle(item)">
+                      mdi-plus 
+                    </v-icon>
                     <v-btn @click="assignToRide(item)">
                     Assign to a ride
                     </v-btn>
@@ -45,7 +53,31 @@
                         name="make"
                         type="text"
                         />
-                        <!-- Fill out with rest of things -->
+                        <v-text-field
+                        v-model="toAssign.model"
+                        name="model"
+                        type="text"
+                        />
+                        <v-text-field
+                        v-model="toAssign.color"
+                        name="color"
+                        type="text"
+                        />
+                        <v-text-field
+                        v-model="toAssign.capacity"
+                        name="capacity"
+                        type="text"
+                        />
+                        <v-text-field
+                        v-model="toAssign.mpg"
+                        name="mpg"
+                        type="text"
+                        />
+                        <v-text-field
+                        v-model="toAssign.licensePlate"
+                        name="licensePlate"
+                        type="text"
+                        />
                     </v-form>
                     <v-data-table show-select
                     v-model="selected"
@@ -59,8 +91,56 @@
                     <v-btn v-on:click="updatevehicle()" color="primary">Update vehicle</v-btn>
                 </v-card-actions>
             </v-card>
-        </div>
 
+            
+            <v-card class="elevation=12" v-if="createVehicle">
+                <v-card-text>
+                    <v-form>
+                        <v-text-field
+                        v-model="toAssign.make"
+                        name="make"
+                        type="text"
+                        />
+                        <v-text-field
+                        v-model="toAssign.model"
+                        name="model"
+                        type="text"
+                        />
+                        <v-text-field
+                        v-model="toAssign.color"
+                        name="color"
+                        type="text"
+                        />
+                        <v-text-field
+                        v-model="toAssign.capacity"
+                        name="capacity"
+                        type="text"
+                        />
+                        <v-text-field
+                        v-model="toAssign.mpg"
+                        name="mpg"
+                        type="text"
+                        />
+                        <v-text-field
+                        v-model="toAssign.licensePlate"
+                        name="licensePlate"
+                        type="text"
+                        />
+                    </v-form>
+                    <v-data-table show-select
+                    v-model="selected"
+                    v-bind:headers="vehicleHeaders"
+                    v-bind:items="vehicles">
+                    </v-data-table>
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer />
+                    <v-btn v-on:click="createVehicle = false">Cancel</v-btn>
+                    <v-btn v-on:click="createvehicle(item)" color="primary">Create vehicle</v-btn>
+                </v-card-actions>
+            </v-card>
+        </div>
+        
         <!-- USERS -->
         <v-btn @click="showUsers = !showUsers">Users</v-btn>
         <div v-if="showUsers">
@@ -221,6 +301,9 @@ export default {
         vehicles: [],
         showVehicles: false,
         updateVehicle: false,
+        createVehicle: false,
+        driverStatus: false,
+        showDriver: false,
 
         userHeaders: [
             { text: "First", value: "firstName" },
@@ -294,7 +377,10 @@ export default {
       this.snackbar.text = text;
       this.snackbar.show = true;
     },
-
+    becomeDriver() {
+      this.driverStatus = true;
+      console.log("You are now a driver");
+    },
     // Calculate the CSS class for an item
     itemClass(item) {
       const currentuser = this.$store.state.currentuser;
@@ -308,6 +394,49 @@ export default {
     editvehicle(item) {
         this.toAssign = item;
         this.updateVehicle = true;
+    },
+
+    addvehicle(item) {
+      this.toAssign = item;
+      this.createVehicle = true;
+    },
+
+    createvehicle(item) {
+      this.toAssign = item;
+      this.createVehicle = true;
+      this.$axios.post(`/vehicles`, {
+        make: this.userToAssign.make,
+        model: this.userToAssign.model,
+        color: this.userToAssign.color,
+        capacity: this.userToAssign.capacity,
+        licensePlate: this.userToAssign.licensePlate,
+      }).then(response => {
+        console.log(response);
+      });
+      
+    },
+
+    updatevehicle() {
+      this.updateVehicle = false;
+      console.log(this.userToAssign.licensePlate);
+      /*this.$axios.patch(`/vehicles/${this.userToAssign.licensePlate}`, {
+          make: this.userToAssign.make,
+          model: this.userToAssign.model,
+          color: this.userToAssign.color,
+          capacity: this.userToAssign.capacity,
+          licensePlate: this.userToAssign.licensePlate
+      }).then(response => {
+          // force update of visible users Ig
+          console.log(response);
+      });
+      this.selected.forEach(ride => {
+          console.log(`${this.userToAssign.licensePlate}, ${ride.id}`);
+          this.$axios.post(`/vehicle/${this.userToAssign.licensePlate}/rides/${ride.id}`);
+      });
+
+        // reset data table selection
+      this.selected = [];
+      */
     },
 
     // USER METHODS
